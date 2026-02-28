@@ -10,15 +10,13 @@ from dotenv import load_dotenv
 load_dotenv()
 API_KEY = os.getenv("GOOGLE_API_KEY")
 
-# ─── Page Config ────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="VerifyAI – Fake News Detector",
+    page_title="TruthLens – Fake News Detector",
     page_icon=None,
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# ─── Custom CSS ──────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
@@ -162,7 +160,6 @@ html, body, [class*="css"] {
 """, unsafe_allow_html=True)
 
 
-# ─── Helpers ─────────────────────────────────────────────────────────────────
 def score_class(score: int) -> str:
     if score < 40:
         return "score-fake"
@@ -186,13 +183,11 @@ def tag_class_for_assessment(assessment: str) -> str:
     return "tag-green"
 
 
-# ─── Gemini Setup ─────────────────────────────────────────────────────────────
 def get_gemini_model(api_key: str):
     genai.configure(api_key=api_key)
     return genai.GenerativeModel("gemini-2.5-flash")
 
 
-# ─── Analysis Function ────────────────────────────────────────────────────────
 def analyze_article(model, text: str, source: str = "") -> dict:
     prompt = f"""
 You are an expert fact-checker and media literacy educator. Analyze the following news article/content for credibility.
@@ -227,8 +222,6 @@ Return ONLY a valid JSON object with this exact structure:
     raw = re.sub(r"```$", "", raw).strip()
     return json.loads(raw)
 
-
-# ─── Session State ────────────────────────────────────────────────────────────
 if "history" not in st.session_state:
     st.session_state.history = []
 if "result" not in st.session_state:
@@ -238,15 +231,13 @@ if "last_source" not in st.session_state:
 if "last_text" not in st.session_state:
     st.session_state.last_text = ""
 
-
-# ─── Sidebar ──────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("## VerifyAI")
+    st.markdown("## TruthLens")
     st.markdown("AI Fact Check Assistant")
     st.markdown("---")
     st.markdown("### About")
     st.markdown(
-        "VerifyAI analyzes news articles for credibility signals, "
+        "TruthLens analyzes news articles for credibility signals, "
         "emotional manipulation, and factual consistency using Gemini AI."
     )
     if st.session_state.history:
@@ -260,16 +251,14 @@ with st.sidebar:
             )
 
 
-# ─── Hero ─────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
-  <h1>VerifyAI</h1>
+  <h1>TruthLens</h1>
   <p>AI-Powered Fake News Detector &nbsp;·&nbsp; Powered by Gemini</p>
 </div>
 """, unsafe_allow_html=True)
 
 
-# ─── Main Layout ──────────────────────────────────────────────────────────────
 col_input, col_result = st.columns([1, 1.1], gap="large")
 
 with col_input:
@@ -289,7 +278,6 @@ with col_input:
     analyze_btn = st.button("Analyze Article")
 
 
-# ─── Analysis Logic ───────────────────────────────────────────────────────────
 if analyze_btn:
     if not API_KEY:
         st.error("GOOGLE_API_KEY not found. Add it to your .env file.")
@@ -316,7 +304,6 @@ if analyze_btn:
                 st.error(str(e))
 
 
-# ─── Display Results ──────────────────────────────────────────────────────────
 with col_result:
     if st.session_state.result:
         r = st.session_state.result
